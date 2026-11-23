@@ -1,0 +1,12 @@
+{
+  "experiment": "Minimal anti-unlearning: OVM (offline value memory) single module on IQLD online fine-tuning",
+  "change": "update_iqld TD target becomes max(online target_value, frozen offline value from init checkpoint); --offline-value-memory flag, default off (no behaviour change)",
+  "formal_5x100": {
+    "v11_original": {"nominal": 0.918, "robust": 0.910, "minsep_n": 0.296},
+    "v11_guarded": {"nominal": 0.908, "robust": 0.916, "minsep_n": 0.307},
+    "A_naive_online_ft": {"nominal": 0.890, "robust": 0.880, "minsep_n": 0.299},
+    "B_pure_offline": {"nominal": 0.904, "robust": 0.892, "minsep_n": 0.299},
+    "C_ovm_online": {"nominal": 0.900, "robust": 0.916, "minsep_n": 0.321, "nominal_colfree": 1.0}
+  },
+  "conclusion": "A single OVM module (max(online, frozen offline value)) clearly counteracts unlearning during online fine-tuning: C beats naive A on nominal (0.900 vs 0.890), robust (0.916 vs 0.880, +3.6pp, ties v11+guard), and nominal min-sep (0.321 vs 0.299). Remaining gap to v11+guard (0.900<0.908) is from online exploration noise + 50/50 expert mixing pulling policy toward worse online trajectories - OVM prevents forgetting but cannot fix low-quality online data; that needs balanced replay or longer training (optional later). Minimal 10-line diff, default-off, backward compatible."
+}

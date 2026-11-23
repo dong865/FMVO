@@ -1,0 +1,16 @@
+{
+  "question": "Which recipe generates TRULY multi-modal (detectable K!=1) expert trajectories?",
+  "setup": "Four injection recipes under one dynamics frame, each with true K=3 (except D = noise control K=1): A multi-expert weights, B hidden intent, C committed role (temporal phase), D random noise. Windows are SequenceMixture-compatible.",
+  "separability_probe": {
+    "window_level_z_class_acc": {"A": 1.000, "B": 1.000, "C": 0.561, "D": 1.000(K=1 single class)"},
+    "episode_level_z_class_acc": {"A": 1.000, "B": 1.000, "C": 1.000, "D": "1.000(K=1)"}
+  },
+  "sequence_mixture_detection": {
+    "A": {"detected_K": 1, "match": 0.28},
+    "B": {"detected_K": 2, "match": 0.42},
+    "C": {"detected_K": 1, "match": 0.28},
+    "D": {"detected_K": 1, "match": 1.00}
+  },
+  "interpretation": "A/B/C ALL generate truly multi-modal trajectories: episode-level (whole-trajectory mean action+effect) classifies z perfectly (1.00). The SequenceMixture detector FAILS to recover K=3 (gives 1-2) because it does per-WINDOW posterior with a reconstruction loss that does not aggregate to the trajectory level - the z signature is only fully visible over the whole episode (esp. C, whose z is a segment-sequence offset; single windows inside a segment carry little z). D (noise) is correctly K=1 (no structure).",
+  "conclusion": "For generating truly multi-modal expert data, A (multi-expert weights) and B (hidden intent) are the most feasible: simplest and window-classifiable-adjacent; C needs trajectory-level (not window-level) aggregation to be discoverable. The real bottleneck is the DISCOVERY side: per-window SequenceMixture cannot recover trajectory-level tactics - need trajectory-level discrete latent (CVAE/1903.10304 style) or window posterior + episode aggregation, exactly as the literature recommended."
+}

@@ -1,0 +1,23 @@
+{
+ "experiment": "Hard-scene benchmark: does IQLD (offline distill + online Cal-QL) exceed the game-theory expert on 'hard' (far1) scenes?",
+ "scene": "preset 'hard' (=far1): interceptor 1.60-1.85 ahead, flanks 1.10-1.35 fwd / 1.10-1.40 lat, spawn band 1.30-2.10 m. Expert baseline measured on the SAME harness: clean 0.796 (250) / 0.840 (125 lite), robust ~0.728 (125 lite); oracle-1.5x = 1.000 -> every scene capturable-by-construction.",
+ "data": "game_theory_expert_hard_300.pt (300 qualified/417 attempts) and hard_600.pt (600 qualified/798 attempts).",
+ "results": {
+  "teacher_game_theory_hard_lite_125": {"nominal": 0.840, "robust": 0.728, "mean_capture_time_s": 3.44, "failures": "19/125 evader goal reach"},
+  "BC_only_hard300_100ep": {"nominal": 0.39, "robust": 0.39},
+  "offline_distill_hard300_1390ep_lite": {"nominal": 0.512, "robust": 0.36, "failures": "47% evader_succeeded"},
+  "v11_legacy_policy_on_hard_lite": {"nominal": 0.552, "robust": 0.52, "note": "never trained on hard scenes; cross-scene transfer"},
+  "armD_v11init_hard600_distill_ep429": {"validation_25ep_seed11": "0.36-0.52 plateau (no gain over v11-on-hard)"},
+  "probeA_naive_online_from_v11_60ep": {"validation": "0.48@20 -> 0.32@60 (degrading from 0.552 init)"},
+  "probeB_calql_online_from_hard_distill_200ep": {"validation": "0.32@20 -> 0.16-0.36 (degrading from 0.52 init); killed at ep104"},
+  "summary": "IQLD family on hard tops out ~0.39-0.55 nominal across BC-only / offline distill / cross-scene transfer / larger data / better init. ONLINE fine-tuning on hard DEGRADES (naive and calibrated), unlike legacy where the calibrated recipe held init level."
+ },
+ "root_cause_analysis": [
+  "Hard scenes apply real difficulty to IQLD: the evader (faster, private goal) escapes in ~47-60% of IQLD episodes vs ~20% vs the teacher - IQLD loses the early interception race.",
+  "Teacher's hard-scene edge is closed-loop game-theoretic: interceptor/flank assignment replanned at a 0.75 s horizon every step. Distillation captures single-step actions but not this reactive re-planning; at ~0.5-0.55 offline IQLD is at an imitation ceiling independent of data size (300 vs 600) and init (random vs v11).",
+  "Online recovery is unstable in the hard regime: low per-rollout success (~50%) means the online mixture trains mostly on failed trajectories with large negative returns (bimodal returns), sparse capture reward; the Cal-QL/OVM anchors are frozen values from a weak 0.5-level init and do not stabilise as they did on legacy (where success was ~90%).",
+  "Result is method/recipe-level, NOT environmental: the same scenes are 100% oracle-1.5x solvable, teacher 0.84, so headroom exists; IQLD+this online recipe cannot harvest it."
+ ],
+ "answer": "NO - IQLD (offline distillation) + the implemented online fine-tune (Cal-QL alpha=1.0/lambda=0.3/OVM/guard, ups=10, anneal 1.0->0.3) does NOT exceed the expert baseline on hard scenes: best IQLD nominal ~0.51-0.55 vs teacher 0.84 (same-harness lite), and online fine-tuning actively degrades (to 0.16-0.36) instead of recovering.",
+ "what_would_be_needed": ["closed-loop/self-generated online learning at higher update ratio with high success-rate exploration (e.g. SAC/RLPD-style, curriculum from legacy-like easy scenes to hard)", "distilling an explicit role/interceptor re-planning controller rather than 1:1 imitation", "or accept hard-scene benchmark as measuring closed-loop advantage beyond current IQLD recipe"]
+}

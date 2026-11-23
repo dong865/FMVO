@@ -1,0 +1,21 @@
+{
+  "scene": "communication-limited observation (2 evaders, 2 gates, 3 pursuers, real 2-D kinematics)",
+  "numbers": {
+    "R_1.0": {"oracle": 1.0, "local_ideal": 0.0, "local_greedy": 0.0},
+    "R_1.6": {"oracle": 1.0, "local_ideal": 0.0, "local_greedy": 0.0},
+    "R_2.2": {"oracle": 1.0, "local_ideal": 0.0, "local_greedy": 0.0},
+    "R_3.0": {"oracle": 1.0, "local_ideal": 0.0, "local_greedy": 0.0},
+    "R_3.2": {"oracle": 1.0, "local_ideal": 0.0, "local_greedy": 0.0},
+    "R_3.5": {"oracle": 1.0, "local_ideal": 1.0, "local_greedy": 1.0},
+    "R_3.8": {"oracle": 1.0, "local_ideal": 1.0, "local_greedy": 1.0},
+    "R_4.2": {"oracle": 1.0, "local_ideal": 1.0, "local_greedy": 1.0},
+    "R_6.0": {"oracle": 1.0, "local_ideal": 1.0, "local_greedy": 1.0}
+  },
+  "finding": "Sharp phase transition at R ~ 3.2-3.5 (the pursuer->own-evader distance). Below it, NO local policy succeeds (can't see target); above it, ALL succeed including greedy. There is NO regime where 'division of labour' separates local_greedy from local_ideal: when an evader is visible, every pursuer chases the nearest and the geometry splits them naturally; when not visible, no division signal helps.",
+  "vs_three_walls": {
+    "W1_follow_saturates": "Avoided only trivially: at small R local fails because it CANNOT see (no follow possible), but at large R follow saturates (all 1.0) - same wall as before, just pushed to R.",
+    "W2_leakage": "No clean regime: either position leaks enough that greedy is optimal, or comm hides so much that even ideal division fails.",
+    "W3_feasible_vs_decisive": "Feasibility fine (oracle 1.0 everywhere), but there is NO decisive window where division matters."
+  },
+  "conclusion": "With this geometry (each pursuer ~ one evader's lane), communication limit is a binary switch, not a tunable 'division-of-labour matters' regime. Greedy nearest-chase already achieves the optimal division whenever sensing suffices. To make division NON-trivial, evaders must be able to swap lanes / be ambiguous which pursuer should cover which (assignment genuinely multi-modal), not merely invisible sometimes. This probe does NOT yet demonstrate that scene 3 escapes the earlier walls."
+}

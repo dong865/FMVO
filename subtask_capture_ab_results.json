@@ -1,0 +1,26 @@
+{
+  "cond": {
+    "nominal": {
+      "capture": 0.9,
+      "colfree": 1.0,
+      "minsep": 0.33365438991959595
+    },
+    "robust": {
+      "capture": 0.914,
+      "colfree": 0.994,
+      "minsep": 0.2968506247161257
+    }
+  },
+  "uncond": {
+    "nominal": {
+      "capture": 0.904,
+      "colfree": 1.0,
+      "minsep": 0.33190327528939095
+    },
+    "robust": {
+      "capture": 0.908,
+      "colfree": 0.994,
+      "minsep": 0.29849453287694244
+    }
+  }
+}

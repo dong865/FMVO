@@ -1,0 +1,27 @@
+{
+ "experiment": "Quick method-vs-environment test: same Cal-QL calibrated Q-max fine-tune from a WEAKER init (P0 well below the v11 strong init), plus a teacher ceiling probe",
+ "question": "The Cal-QL/Qmax arms plateau ~0.91 and never exceed the 0.944 teacher. Is that a METHOD problem (fine-tuning cannot improve / exceeds nothing) or an ENVIRONMENT problem (0.944 ~ ceiling, no room)?",
+ "weak_init_generation": "Short v11-style OFFLINE distillations (same config/hyperparams as v11, expert fraction 1.0, expectile 0.9, low BC budget). KEY FINDING: IQLD distillation saturates almost instantly - 60ep/bc800 formal 0.900/0.902, 150ep/bc1500 formal 0.906/0.908, full 2000ep v11 0.918/0.910. There is no easy way to make a much weaker init by shortening distillation; all IQLD distills of this teacher land ~0.90-0.92.",
+ "P0_P1_ladder": {
+  "weak_init_150ep": {"P0": [0.906, 0.908]},
+  "calql_ft_from_weak150_latest_ep200": {"P1": [0.886, 0.870], "delta": [-0.020, -0.038], "colfree": [0.998, 0.988]},
+  "calql_ft_from_weak150_best_safe": {"P1": [0.894, 0.890], "delta": [-0.012, -0.018], "colfree": [1.0, 0.992]},
+  "strong_init_v11": {"P0": [0.918, 0.910]},
+  "calql_ft_from_v11_best_safe": {"P1": [0.910, 0.910], "delta": [-0.008, 0.0]},
+  "calql_ft_from_v11_latest_ep200": {"P1": [0.904, 0.876], "delta": [-0.014, -0.034]}
+ },
+ "teacher_ceiling_probe": {
+  "setup": "700 nominal episodes (seeds 101..), game-theory teacher, classify every miss",
+  "capture_rate": 0.9343,
+  "failures": {"evader_succeeded_goal_reach": 45, "safety_failure": 0, "timeout_near_miss": 0, "timeout_far": 1},
+  "near_miss_share_of_failures": 0.0,
+  "reading": "When the teacher loses, the goal-directed evader (private goal + potential field, 0.50 vs 0.45 m/s speed advantage) reaches its goal cleanly; the teacher NEVER had it enclosed near capture and lost it. 0.944 ~ environment ceiling for closed-loop pursuit; there is essentially no near-miss margin to harvest with sharper play."
+ },
+ "conclusion": {
+  "verdict": "Mostly ENVIRONMENT, with a small secondary METHOD-side distill gap",
+  "environment": "Teacher failures are 98% decisive evader goal-reaches, 0% near-misses over 700 episodes -> ~0.94 is the effective ceiling for this 3v1 contract-v2 task; exceeding the 0.944 teacher with ANY method is close to impossible by construction (uncatchable episodes, not unlucky margins).",
+  "method": "IQLD distillation saturates at ~0.90-0.92 (60ep already 0.900); a persistent ~2-4pp distill loss to the teacher's own closed-loop play exists but calibrated online fine-tuning cannot close it - from a weak start (0.906) it drifts DOWN slightly (best_safe 0.894/0.890, latest 0.886/0.870); from the strong start it holds ~0.91. No loss-level tweak found any headroom, consistent with the ceiling probe.",
+  "what_would_help": "Not better losses. Either task-design change (pursuer speed/count/capture radius advantage, non-private evader goal, larger arena) or genuinely new behavior data beyond the teacher's own - but given 0% near-miss the teacher data already covers what is capturable.",
+  "note_minsep": "robust minsep ~0.295 marginally below the 0.30 gate across ALL arms incl. teacher-era baselines: a separate safety-margin calibration issue, unchanged by these experiments."
+ }
+}

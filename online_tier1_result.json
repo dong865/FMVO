@@ -1,0 +1,13 @@
+{
+  "experiment": "Tier-1 online annealing fine-tune from v11 best_safe (400 ep, expert_fraction 1.0->0.35 anneal 0.6, exploration_noise 0.15, safety guard, seed 11, k_roles=1)",
+  "rationale": "v11 was trained with expert_fraction 1.0 -> online replay never entered the batch; this run re-opens the self-bootstrapping channel to test whether strategy-generated trajectories beat the teacher (94.4%).",
+  "formal_5x100": {
+    "v11_baseline": {"nominal": 0.918, "robust": 0.910},
+    "teacher": {"nominal": 0.944, "robust": 0.924},
+    "tier1_latest_ep400": {"nominal": 0.894, "robust": 0.900, "nominal_minsep": 0.2982, "robust_minsep": 0.3000, "colfree": "0.998/0.998", "violations": 0},
+    "tier1_best_safe_ep100": {"nominal": 0.896, "robust": 0.896, "nominal_minsep": 0.2980, "robust_minsep": 0.2975, "colfree": "0.998/0.996", "violations": 0}
+  },
+  "training_observation": "best_safe froze at episode 100 and best_capture at episode 75; validation capture did NOT improve over the last 300 episodes; exploration noise 0.15 produced periodic failed episodes late in training.",
+  "verdict": "Online annealing did NOT beat v11: latest 0.894 and best_safe 0.896 are both BELOW the v11 baseline 0.918 and far below the teacher 0.944. Re-opening the online channel from a warm-started v11 for 400 episodes did not produce self-generated trajectories better than the teacher; it drifted slightly DOWNWARD.",
+  "implication": "Tier-1 negative. Stopping the online self-bootstrapping direction per the pre-registered rule (did not exceed 0.918). Consistent with the prior findings: the gap to the teacher is not closed by more/longer training, better weights, value headroom, or online mixing at this scale. The 'need better-than-teacher DATA, not a better loss' conclusion stands; producing such data (stronger teacher / real exploration from scratch, not warm-started fine-tune) is a separate larger effort."
+}

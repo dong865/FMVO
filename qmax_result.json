@@ -1,0 +1,7 @@
+{
+  "experiment": "actor Q-maximization (-lambda*E[Qmin(s,pi(s))]) for exceeding-expert online fine-tuning",
+  "setup": "v11 init, 200ep, lambda 0.3, updates-per-step 10, expert->0.3, guard, exploration 0.1",
+  "validation_curve": {"capture_rate": [0.28,0.32,0.52,0.40,0.32,0.28,0.36,0.40,0.56,0.52], "collision_free": [0.52,0.64,0.72,0.60,0.40,0.48,0.60,0.64,0.64,0.72], "minsep": [0.29,0.30,0.30,0.30,0.29,0.29,0.30,0.30,0.30,0.29]},
+  "result": "FAILED: validation capture peaks at 0.56 (vs v11 ~0.9), collision-free collapses to 0.4-0.7, no best_safe ever written (never met safe threshold). Training returns oscillate to negative frequently.",
+  "conclusion": "Naive actor Q-maximization without conservative calibration FAILS in this scene, confirming the earlier OOD headroom probe (85.7% of 'better' neighbours are Q hallucination at action boundary |d|~1.03): the actor chases OOD-overestimated actions, breaking both capture and safety. To exceed expert one needs Cal-QL-style calibration (Q anchored & not over-optimistic OOD) BEFORE Q-maximizing, not bare -Qmin."
+}

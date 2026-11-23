@@ -1,0 +1,17 @@
+{
+  "question": "Precondition for upgrading IQLD from weighted BC to value-guided policy improvement: does the data contain value-recognizable improvement room (a neighbouring action clearly better than the teacher, not OOD hallucination)?",
+  "setup": "300 teacher transitions, v11 critics, per-pursuer 12-direction x {0.25,0.5,1.0} perturbation search + whole-team variants",
+  "numbers": {
+    "Q_teacher_mean": 39.430,
+    "best_candidate_Q_mean": 39.803,
+    "mean_best_delta": 0.3726,
+    "median_best_delta": 0.2310,
+    "frac_states_with_clearly_better_candidate": 0.857,
+    "teacher_local_optimality_small_perturb": -0.0010,
+    "mean_best_delta_action_magnitude": 1.03,
+    "improved_states": 257
+  },
+  "interpretation": "Superficially 85.7% of states have a 'better' neighbour action, BUT the improving candidates are on average |d action| ~ 1.03 AWAY from the teacher (i.e. pushed to the action-space boundary), while the teacher is locally Q-optimal under small (+-0.1) perturbations. => The apparent improvement room is dominated by Q hallucination on out-of-distribution boundary actions, NOT real local advantage over the teacher.",
+  "verdict": "NO trustworthy value-guided improvement room in this data. Upgrading to naive DPG-style improvement would chase Q hallucinations and diverge; a conservative (CQL-style) version would be needed, but with teacher locally optimal and data near-optimal, even conservative improvement has little real upside.",
+  "implication": "The ~3pp gap to the teacher is NOT recoverable by value-guided policy improvement on the current data. Consistent with prior findings: value headroom (rho 0.80->0.88) did not transfer; the gap is an inherent distillation ceiling. To go beyond, the DATA must contain better-than-teacher trajectories (different/better teachers or real exploration), not a better loss."
+}

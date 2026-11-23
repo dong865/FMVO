@@ -1,0 +1,22 @@
+{
+  "experiment": "Graft check: trajectory-level CVAE discovery -> causal zhat -> conditioned distillation, on window features built role-style (focal rel-pos/vel windows).",
+  "results_full_run": {
+    "recipe_A_multi_expert": {
+      "true_K": 3, "detected_K": 3, "trajectory_match": 1.00,
+      "selection_loss_K1_4": ["0.0147","0.0015","0.0011","0.0011"],
+      "causal_zhat_acc": 1.000, "majority": 0.333,
+      "bc_mse": {"uncond": 0.00142, "cond": 0.00147, "rel": "+3.32%"},
+      "note": "zhat perfectly recoverable from observable history (acc 1.00 vs majority 0.33) BUT conditioning does NOT improve BC at the full scale (+3.3% = slightly worse). The discovery+causal parts graft perfectly; the DISTILLATION gain from zhat does NOT appear here."
+    },
+    "recipe_D_noise_control": {
+      "true_K": 1, "detected_K": 1, "selection_loss_K1_4": ["0.4282","0.4182","0.4140","0.4152"],
+      "bc_mse": {"uncond": 0.26909, "cond": 0.35817, "rel": "+33.10%"},
+      "note": "single-class conditioning is meaningless (adds capacity only); correctly K=1."
+    }
+  },
+  "smoke_run_contrast": {
+    "recipe_A": {"per_ep_60": "cond -19.88% better; causal acc 0.990"},
+    "lesson": "small-scale smoke OVERSTATED the conditioning gain (-19.9%); at full scale the gain disappears (+3.3%). Distillation-gain claims need the full sample, not a smoke."
+  },
+  "graft_conclusion": "The trajectory-level CVAE DISCOVERY + CAUSAL zhat graft onto the role/IQLD pipeline works perfectly on multi-modal data (detect K=3, recover z from history with acc 1.00). But CONDITIONED DISTILLATION shows no gain at full scale (+3.3%): consistent with the whole-session finding that conditioning helps only when z is NOT fully recoverable from the (history-visible) state. Here z IS fully recoverable (acc 1.00) -> conditioning is redundant, mirroring the 3V1/strong-base redundancy. To make conditioning pay, the tactic must be only PARTIALLY observable (POMO-style), not fully readable from history."
+}

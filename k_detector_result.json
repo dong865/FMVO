@@ -1,0 +1,15 @@
+{
+  "question": "Can the K-selection strategy reliably DETECT K != 1 (multiple tactics) on multi-solution expert trajectories?",
+  "setup": "Synthetic multi-modal trajectories with KNOWN true K (2 or 3 injected tactic modes, plus a single-modal K=1 control). Discovery = per-window SequenceMixture; trajectory-level majority vote. Old rule = 1-SE (hardcoded se + complexity penalty); New rule = best-restart selection loss + empty-cluster disqualify + greedy relative-improvement across K.",
+  "results": {
+    "true_K_2": {"old_1se": 2, "new": 2, "traj_tactic_match": 1.00, "selection_losses": ["0.0260","0.0004","inf","inf"]},
+    "true_K_3": {"old_1se": 3, "new": 3, "traj_tactic_match": 1.00, "selection_losses": ["0.0230","0.0004","0.0004","inf"]},
+    "true_K_1_control": {"old_1se": 1, "new": 1, "traj_tactic_match": 1.00, "selection_losses": ["0.0004","inf","inf","inf"]}
+  },
+  "key_fixes": [
+    "(1) posterior-collapse / empty-cluster: single-restart K=3 collapsed to occupancy [0,2112,858] making K=3 look worse than K=2; fixed by BEST-RESTART over seeds + disqualify any K with an empty cluster (occupancy<1 => loss=inf).",
+    "(2) unreliable K rule: old 1-SE with hardcoded se=0.001 + complexity penalty crushed true structure into K=1; new rule uses best-seed selection loss + greedy relative improvement (accept larger K only if clearly better), with empty-cluster disqualification.",
+    "(3) evaluation must be permutation-free: cluster ids are arbitrary; report best-permutation trajectory-tactic match."
+  ],
+  "conclusion": "With the fixes, K != 1 IS reliably detectable (K=2 and K=3 both recovered; single-modal control stays at K=1, no false positive), and trajectory-level tactic identity is recovered perfectly (match 1.00). The old rule was NOT the main bottleneck alone - posterior collapse of the mixture was equally important."
+}

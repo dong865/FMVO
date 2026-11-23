@@ -1,0 +1,120 @@
+{
+ "experiment": "IQLD x SAC-prior self-bootstrap on 'hard' scenes - resumed from offline_hard best_safe (0.51)",
+ "mechanism": "Warm start from IQLD offline checkpoint; frozen copy of the deterministic IQLD actor becomes pi_prior; critics switch to SAC-style TD target at the current policy's own next-state actions (target-Q polyak); policy loss = anchor(adv-weighted BC to expert data) + prior_weight(t)*E||pi_theta(s)-pi_prior(s)||^2 (frozen-prior trust region, annealed 3.0->0.6) + sac_weight*(alpha*log pi - min Q(s,a~pi)); symmetric 50/50 online/offline batches; eval uses deterministic mean actions.",
+ "results_5x100_hard": {
+  "sacprior_hard150_best_safe_ep60": {
+   "nominal": 0.814,
+   "nominal_wilson95": [
+    0.778,
+    0.846
+   ],
+   "robust": 0.764,
+   "robust_wilson95": [
+    0.725,
+    0.799
+   ],
+   "colfree": [
+    0.998,
+    0.998
+   ]
+  },
+  "sacprior_hard150_latest_ep150": {
+   "nominal": 0.796,
+   "nominal_wilson95": [
+    0.758,
+    0.829
+   ],
+   "robust": 0.784,
+   "robust_wilson95": [
+    0.746,
+    0.818
+   ],
+   "colfree": [
+    0.998,
+    0.99
+   ]
+  },
+  "game_theory_teacher_formal_5x100": {
+   "nominal": 0.834,
+   "nominal_wilson95": [
+    0.799,
+    0.864
+   ],
+   "robust": 0.714,
+   "robust_wilson95": [
+    0.673,
+    0.752
+   ],
+   "colfree": [
+    1.0,
+    0.998
+   ],
+   "mean_capture_time_s": 3.54
+  },
+  "resume_point_offline_hard_best_safe": {
+   "nominal": 0.51,
+   "robust": 0.36,
+   "note": "lite 125; formal family floor ~0.5"
+  },
+  "old_online_controls_on_hard": {
+   "naive_online_from_v11": "0.55->0.32 val",
+   "calql_online_from_offline": "0.52->0.16-0.36 val"
+  },
+  "sacprior_anneal300_best_safe_ep40": {
+   "nominal": 0.79,
+   "robust": 0.772,
+   "colfree": [
+    1.0,
+    0.994
+   ]
+  },
+  "sacprior_anneal300_latest_ep300": {
+   "nominal": 0.808,
+   "robust": 0.842,
+   "colfree": [
+    1.0,
+    0.99
+   ]
+  }
+ },
+ "statistics_2prop_z_test_n500": {
+  "nominal_sac_best_vs_teacher": {
+   "z": -0.83,
+   "p": 0.406,
+   "verdict": "below teacher, NOT significant"
+  },
+  "nominal_sac_latest_vs_teacher": {
+   "z": -1.55,
+   "p": 0.122,
+   "verdict": "below teacher, NOT significant"
+  },
+  "robust_sac_best_vs_teacher_0.714": {
+   "z": 1.8,
+   "p": 0.072,
+   "verdict": "above teacher, marginal"
+  },
+  "robust_sac_latest_vs_teacher_0.714": {
+   "z": 2.55,
+   "p": 0.011,
+   "verdict": "above teacher, SIGNIFICANT"
+  },
+  "nominal_anneal_latest_vs_teacher_0.834": {
+   "z": -1.07,
+   "p": 0.284,
+   "verdict": "below teacher, NS"
+  },
+  "robust_anneal_best_vs_teacher_0.714": {
+   "z": 2.1,
+   "p": 0.036,
+   "verdict": "above teacher, significant"
+  },
+  "robust_anneal_latest_vs_teacher_0.714": {
+   "z": 4.87,
+   "p": 4e-06,
+   "verdict": "above teacher, STRONGLY significant"
+  }
+ },
+ "conclusion": "Prior-anchored SAC lifts IQLD on hard scenes from ~0.5 to teacher level in 150ep (fixed beta: robust 0.764-0.784 > teacher 0.714) and BEYOND with annealed prior release at 300ep: latest robust 0.842 vs teacher 0.714 (z=4.87, p<1e-5); nominal 0.79-0.81 vs teacher 0.834 (below, NS). NOTE: seed-11 25-ep validation under-estimates this family badly (0.28@300 vs formal robust 0.842) - trust multi-seed formal. Annealed release materially helps robust.",
+ "anneal_variant": "COMPLETE: sacprior_anneal_hard300 (300ep, prior 3.0->0.6)",
+ "artifacts": "runs/hard_bench/sacprior_hard_ckpt/{best_safe,best_capture,latest}.pt; liteeval_sacprior_{best,latest}/; formal_teacher_hard/; HANDOVER_HARD_SAC.md"
+}

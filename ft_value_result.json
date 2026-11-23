@@ -1,0 +1,10 @@
+{
+  "experiment": "short joint fine-tune from v11 best_safe (200 episodes, value+policy co-trained with safety guard, k_roles=1, seed 11)",
+  "hypothesis": "value quality curve showed rho(Qmin,MC) 0.80->0.884 headroom, so more value training should help",
+  "formal_5x100": {
+    "v11_best_safe_baseline": {"nominal_capture": 0.918, "robust_capture": 0.910, "nominal_minsep": 0.2961, "robust_minsep": 0.2913, "nominal_colfree": 0.992},
+    "v11_guarded_baseline":   {"nominal_capture": 0.908, "robust_capture": 0.916, "nominal_minsep": 0.3065, "robust_minsep": 0.2982},
+    "ft_200ep_best_safe":     {"nominal_capture": 0.892, "robust_capture": 0.890, "nominal_minsep": 0.2980, "robust_minsep": 0.2989, "nominal_colfree": 0.998, "robust_colfree": 0.994, "violations": 0}
+  },
+  "conclusion": "The 200-episode joint fine-tune did NOT improve capture: nominal 0.892 vs v11-guarded 0.908 (-1.6pp), robust 0.890 vs 0.916. Value-quality headroom (rho 0.80->0.88) did NOT transfer to a capture gain in this bounded fine-tune. Possible reasons: (1) 200 eps is too short / needs longer or different recipe; (2) the frozen-policy value continuation in the probe does not reflect co-trained dynamics; (3) the ~3pp gap to the teacher is NOT a value-quality problem but an inherent distillation ceiling (equal-weight BC already ~ the teacher level)."
+}

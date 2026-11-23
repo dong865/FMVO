@@ -1,0 +1,11 @@
+{
+  "experiment": "Does naive offline-to-online IQLD fine-tuning fall into an unlearning trough (Cal-QL/OVMSE prediction)?",
+  "design": "from v11 best_safe, 180 ep, guard-in-loop. A: expert_fraction 1.0->0.5 (online data truly in batch, confirmed actual 0.5). B: expert_fraction 1.0 (pure offline control). Formal 5x100 eval of best_safe each.",
+  "formal_results": {
+    "v11_best_safe": {"nominal": 0.918, "robust": 0.910},
+    "v11_guarded": {"nominal": 0.908, "robust": 0.916},
+    "A_naive_online_ft": {"nominal": 0.890, "robust": 0.880, "nominal_minsep": 0.2992},
+    "B_pure_offline_cont": {"nominal": 0.904, "robust": 0.892, "nominal_minsep": 0.2986}
+  },
+  "conclusion": "CONFIRMED: naive online fine-tuning (A) is WORSE than pure offline continuation (B): nominal 0.890 vs 0.904, robust 0.880 vs 0.892. Introducing online data WITHOUT anti-unlearning mechanisms degrades the pretrained policy - the Cal-QL/OVMSE 'unlearning trough'. 180 episodes is NOT enough to exit the trough (A stays below its start). Reproduces the user's earlier 200-ep drop (0.908->0.892). B (offline-only) also does not improve (consistent with rho 0.80->0.88 not transferring). Remedy per literature: Cal-QL calibration or OVMSE offline-value-memory (target=max(offline memory, online TD)) + sequential exploration; plain expert_fraction annealing is insufficient."
+}

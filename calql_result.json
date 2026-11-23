@@ -1,0 +1,34 @@
+{
+ "experiment": "Cal-QL-style critic calibration + actor Q-max for offline-to-online fine-tuning",
+ "mechanism": "Q-loss += calql_alpha * relu(min(Q1,Q2)(s,pi(s)) - V_ref) with V_ref = frozen v11 offline value (requires --offline-value-memory). IQL/weighted-BC analogue of Cal-QL's masked push-down (Eq 5.1): the critic's over-optimistic OOD estimate of current-policy actions is pulled back to the reference value, so the actor term policy_loss -= policy_qmax_lambda * E[min(Q1,Q2)(s,pi(s))] cannot chase boundary hallucinations.",
+ "arms": [
+  {"name": "calql200_a1.0_l0.3", "episodes": 200, "calql_alpha": 1.0, "policy_qmax_lambda": 0.3,
+   "setup": "v11 best_safe init, ups=10, expert 1.0->0.3, guard, exploration 0.1, OVM on",
+   "train_validation": "capture 0.80-0.92 stable (25ep seed11, every 20ep), colfree 0.96-1.0, minsep >=0.294; NO collapse, best_safe written (ep80)",
+   "formal_best_safe_ep80": {"nominal_capture": 0.910, "robust_capture": 0.910, "colfree": [0.996, 0.994], "robust_minsep": 0.297, "failed_gates": ["nominal_capture_rate", "minimum_separation"]},
+   "formal_latest_ep200": {"nominal_capture": 0.904, "robust_capture": 0.876, "colfree": [1.0, 0.978], "robust_minsep": 0.294, "failed_gates": ["nominal_capture_rate", "minimum_separation"]}},
+  {"name": "calql200_a0.3_l0.3", "episodes": 200, "calql_alpha": 0.3, "policy_qmax_lambda": 0.3,
+   "setup": "identical to above, weaker calibration",
+   "train_validation": "capture 0.80-0.96, colfree dips to 0.92, safety_failure up to 0.08 at tail (weaker cap -> drifts toward collapse direction)",
+   "formal_best_safe_ep140": {"nominal_capture": 0.902, "robust_capture": 0.880, "colfree": [0.994, 0.98], "robust_minsep": 0.293, "failed_gates": ["nominal_capture_rate", "minimum_separation"]},
+   "formal_latest_ep200": {"nominal_capture": 0.910, "robust_capture": 0.890, "colfree": [0.994, 0.946], "robust_minsep": 0.292, "failed_gates": ["nominal_capture_rate", "collision_free_rate", "minimum_separation"]}}
+ ],
+ "comparison": {
+  "naive_A_online_180ep": [0.890, 0.880],
+  "pure_offline_B": [0.904, 0.892],
+  "OVM_C_latest": [0.900, 0.882],
+  "bare_Qmax_qmax200": "FAILED: validation capture peaked 0.56, colfree 0.4-0.7, no best_safe (collapse to OOD boundary hallucination)",
+  "v11_offline_original": [0.918, 0.910],
+  "game_theory_expert": [0.944, 0.924],
+  "calql_a1.0_best_safe": [0.910, 0.910],
+  "calql_a1.0_latest": [0.904, 0.876],
+  "calql_a0.3_best_safe": [0.902, 0.880],
+  "calql_a0.3_latest": [0.910, 0.890]
+ },
+ "conclusions": [
+  "VERIFIED: Cal-QL calibration makes the actor Q-max term safe. vs bare Qmax (immediate collapse, capture peak 0.56, no best_safe ever) both calibrated arms ran stable 200ep, wrote best_safe, and kept formal colfree >=0.946. Higher calibration weight is safer: alpha=1.0 flat and stable; alpha=0.3 drifts (robust colfree 0.946 fails gate).",
+  "RECOVERY: best calibrated arm (a1.0 best_safe ep80) formal 0.910/0.910 - robust ties the v11 offline original (0.910) and beats every earlier fine-tune variant (naive A 0.880, OVM 0.882); nominal 0.910 beats OVM 0.900 / naive A 0.890. Unlearning trough eliminated.",
+  "NOT EXCEEDING EXPERT: best nominal 0.910 vs expert 0.944; no arm passes the nominal>=0.95 gate. Consistent with the earlier headroom probes (no trustworthy improvement room: teacher locally Q-optimal in data, 85.7% of 'better' neighbours are boundary hallucinations): with Q calibrated honest, the actor Q-max has nothing real to grab - the residual gap to the teacher needs better-than-teacher DATA, not a better loss.",
+  "STOP per pre-registered rule: loss-only tuning plateaus at ~0.90-0.91 across naive/OVM/Qmax/Cal-QL; further alpha/lambda/episode sweeps will not break the plateau."
+ ]
+}

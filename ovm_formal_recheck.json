@@ -1,0 +1,13 @@
+{
+  "recheck": "Previously reported 'C-arm robust 0.916 ties v11+guard' was an artifact: C-arm best_safe was checkpointed at episode 10 (near-untrained). Formal eval of C-arm LATEST (episode 180, true post-training) gives the honest number.",
+  "formal_5x100_post_training": {
+    "v11_original": {"nom": 0.918, "rob": 0.910},
+    "v11_guarded": {"nom": 0.908, "rob": 0.916},
+    "A_naive_best_safe": {"nom": 0.890, "rob": 0.880},
+    "B_offline_best_safe": {"nom": 0.904, "rob": 0.892},
+    "C_ovm_best_safe_ep10": {"nom": 0.900, "rob": 0.916, "note": "near-untrained checkpoint"},
+    "C_ovm_LATEST_ep180": {"nom": 0.900, "rob": 0.882, "minsep_n": 0.330},
+    "ovm_200ep_best_safe_ep140": {"nom": 0.890, "rob": 0.880, "minsep_n": 0.296}
+  },
+  "corrected_conclusion": "OVM does NOT provide credible unlearning protection / capture recovery in this 180-200ep small-scale online fine-tune: C-latest (0.900/0.882) is indistinguishable from naive A on robust (0.882 vs 0.880); the 200ep run (0.890/0.880) equals naive A. The earlier 'robust 0.916' was a near-untrained ep10 best_safe artifact. All trained arms sit at nominal <=0.90 / robust <=0.89, below v11 original 0.918/0.910: with guard + exploration + online data, capture does NOT recover within 200 episodes. OVM's max-anchor is insufficient in this budget; possible reasons: (1) max anchor prevents value from dropping but online 50% poor trajectories still pull the POLICY; (2) 200ep too short; (3) guard-in-loop already caps recoverable capture."
+}

@@ -1,0 +1,15 @@
+{
+  "experiment": "Trajectory-level CVAE discovery (encoder q(z|full trajectory obs+act+eff), decoder p(a,e|obs,z)) to recover trajectory-level tactic K on recipe-A data.",
+  "results": {
+    "A_multi_expert": {
+      "injected_K": 3, "detected_K": 3, "trajectory_tactic_match": 1.00,
+      "selection_loss_K1_4": ["0.0133","0.0013","0.0010","0.0010"],
+      "occupancy_chosen_K": [5,24,24,22]   // chosen K=3 -> its occupancy from run is not directly this row; K4 listed
+    },
+    "D_noise_control": {
+      "injected_K": 1, "detected_K": 1, "trajectory_tactic_match": 1.00,
+      "selection_loss_K1_4": ["0.4284","0.4187","0.4130","0.4155"]
+    }
+  },
+  "conclusion": "Trajectory-level CVAE FIXES what per-window SequenceMixture could not: recipe-A (multi-expert weights) data is detected as K=3 with perfect trajectory-tactic match (1.00); noise control D stays K=1 (losses flat ~0.42, no improvement => no structure). Best-restart + empty-cluster disqualify + relative-improvement K selection continues to work. This closes the loop: (1) A/B/C recipes generate truly separable multi-modal trajectories (episode-level z acc 1.00 from prior scan), (2) trajectory-level latent (CVAE) now DETECTS K=3. Per-window mixture was the wrong inductive bias for trajectory-level tactics."
+}
